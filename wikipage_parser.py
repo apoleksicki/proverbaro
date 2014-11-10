@@ -27,18 +27,15 @@ class ProverbsWikipageParser(HTMLParser):
             self._parsing_proverb = not self._parsing_proverb
             self._proverb = ''
     def handle_starttag(self, tag, attrs):
-        print "Encountered a start tag:", tag
         self._change_state(tag)
     def handle_endtag(self, tag):
-        print "Encountered an end tag :", tag
         if self._parsing_proverb and tag == 'li':
             self._parsed.append(self._proverb)
+            print(self._proverb)
         self._change_state(tag)
     def handle_data(self, data):
-        print data
         if self._parsing_proverb:
             self._proverb += data
-            print '_proverb: ' + self._proverb
     @property
     def parsed(self):
         return self._parsed
@@ -49,5 +46,8 @@ def parse(to_parse):
     print len(parser.parsed)
     parser._parsed
 
-to_parse('<li>Almozpetanto <a href="/wiki/Sin%C4%9Deno" title="Sinĝeno">sinĝena</a> restas kun sako malplena.</li>')
+to_parse = '<li>Almozpetanto <a href="/wiki/Sin%C4%9Deno" title="Sinĝeno">sinĝena</a> restas kun sako malplena.</li>'
 
+if __name__ == '__main__':
+    fetch_wikpage()
+    parse_wikipage()
