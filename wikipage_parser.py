@@ -25,9 +25,13 @@ class ProverbsWikipageParser(HTMLParser):
         self._parsed = []
         self._parsing_proverb = False
         self._proverb = None
+        self._parsing_finished = False
 
     def _change_state(self, tag):
-        if tag == 'li':
+        if tag == 'noscript':
+        #Encountering means the content part has ended and now some general page stuff will appear
+            self._parsing_finished = True
+        if tag == 'li' and not self._parsing_finished:
             self._parsing_proverb = not self._parsing_proverb
             self._proverb = ''
     def handle_starttag(self, tag, attrs):
