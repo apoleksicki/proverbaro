@@ -10,10 +10,14 @@ def fetch_wikpage():
     file.close()
 
 def parse_wikipage():
-    parser = ProverbsWikipageParser()
+    page = None
     with open('website.html', 'r') as input_file:
-        with open('output.txt', 'w') as output_file:
-            output_file.write(parser.feed(input_file.read()))
+        page = input_file.read()
+    parser = ProverbsWikipageParser()
+    parser.feed(page)
+    with open('output.txt', 'w') as output_file:
+        for proverb in parser.parsed:
+            output_file.write(proverb + '\n')
 
 class ProverbsWikipageParser(HTMLParser):
     def __init__(self):
@@ -45,8 +49,6 @@ def parse(to_parse):
     parser.feed(to_parse)
     print len(parser.parsed)
     parser._parsed
-
-to_parse = '<li>Almozpetanto <a href="/wiki/Sin%C4%9Deno" title="Sinĝeno">sinĝena</a> restas kun sako malplena.</li>'
 
 if __name__ == '__main__':
     fetch_wikpage()
