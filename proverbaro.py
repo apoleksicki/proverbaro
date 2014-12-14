@@ -21,18 +21,19 @@ s = Session(bind=e)
 def find_min_shown_times():
     return s.query(func.min(Proverb.shown_times))
 
-def get_proverbs():
+def get_proverbs(debug=False):
     s = Session(bind=e)
-    proverbs = s.query(Proverb).filter(Proverb.shown_times == s.query(func.min(Proverb.shown_times))).all()
+    proverbs_query = s.query(Proverb).filter(Proverb.shown_times == s.query(func.min(Proverb.shown_times)))
+    if debug:
+        proverbs_query = proverbs_query.limit(10)
+    proverbs = proverbs_query.all()
     shuffle(proverbs)
     return proverbs
 
-proverbs = get_proverbs()
-len(proverbs)
+get_proverbs(debug=True)
 
 def print_all_proverbs():
-    s = Session(bind=e)
-    for p in s.query(Proverb).all():
+    for p in get_proverbs(debug=True):
         print p.shown_times, p.text.encode("utf-8")
 
 print_all_proverbs()
