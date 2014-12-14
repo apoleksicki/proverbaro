@@ -16,17 +16,20 @@ class Proverb(Base):
     text = Column(Unicode, nullable=False)
     shown_times = Column(Integer, default=0, nullable=False)
 
-def get_proverbs(debug=False):
-    s = Session(bind=e)
-    proverbs_query = s.query(Proverb).filter(Proverb.shown_times == s.query(func.min(Proverb.shown_times)))
+def get_proverbs(session, debug=False):
+    proverbs_query = session.query(Proverb).filter(Proverb.shown_times == s.query(func.min(Proverb.shown_times)))
     if debug:
         proverbs_query = proverbs_query.limit(10)
     proverbs = proverbs_query.all()
     shuffle(proverbs)
     return proverbs
 
+def mark_as_shown(proverb):
+    pass
+
+
 def print_all_proverbs():
-    for p in get_proverbs(debug=True):
+    for p in get_proverbs(Session(bind=e), debug=True):
         print p.shown_times, p.text.encode("utf-8")
 
 if __name__ == '__main__':
