@@ -24,13 +24,44 @@ def get_proverbs(session, debug=False):
     shuffle(proverbs)
     return proverbs
 
-def mark_as_shown(proverb):
-    pass
+session = Session(bind=e)
+proverbs_query = session.query(Proverb).filter(Proverb.shown_times == s.query(func.min(Proverb.shown_times))).order_by(func.random())
+proverbs_query
+proverb = proverbs_query.first()
+proverb.text
 
+def mark_as_shown(session, proverb):
+    proverb.id += 1
+    session.add(proverb)
+
+def show_proverbs(proverbs):
+    for proverb in proverbs:
+        session = Session(bind=e)
+        try:
+            mark_as_shown(session, proverb)
+            session.commit()
+        except:
+            session.rollback()
+        finally:
+            session.close()
+        print proverb.text.encode("utf-8")
+
+def main_loop():
+    session = Session(bind=e)
+    proberbs = None
+    try:
+        proverbs = get_proverbs(session, True)
+    finally:
+        session.close()
+    show_proverbs(proverbs)
+
+main_loop()
 
 def print_all_proverbs():
     for p in get_proverbs(Session(bind=e), debug=True):
         print p.shown_times, p.text.encode("utf-8")
+
+print_all_proverbs()
 
 if __name__ == '__main__':
     for p in s.query(Proverb).all():
