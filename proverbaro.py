@@ -11,14 +11,16 @@ from time import sleep
 import sys, traceback, logging
 
 e = create_engine('sqlite+pysqlite:///proverbaro.db', module=sqlite, encoding="utf-8")
-tp = None
-
-def init_proverbaro(consumer_key, consumer_secret, access_token, access_token_key):
-    tp = TwitterPublisher(consumer_key, consumer_secret,
-                    access_token, access_token_key)
-Base = declarative_base()
 
 logger = logging.getLogger(__name__)
+
+def init_proverbaro(consumer_key, consumer_secret, access_token, access_token_key):
+    global tp
+    tp = TwitterPublisher(consumer_key, consumer_secret,
+                    access_token, access_token_key)
+
+Base = declarative_base()
+
 class TwitterPublisher(object):
     def __init__(self, consumer_key, consumer_secret, access_token, access_token_key):
         self.client = UserClient(consumer_key, consumer_secret, access_token, access_token_key)
@@ -41,7 +43,7 @@ def show_proverb():
             proverb.shown_times += 1
             tp.post(proverb.text)
             session.commit()
-            logger.warning(proverb.text.encode("utf-8"))
+            logger.warning(proverb.text.encode("utf-8").rstrip())
         except:
             traceback.print_exc(file=sys.stdout)
             logger.exception('Exception while posting', exc_info=True)
