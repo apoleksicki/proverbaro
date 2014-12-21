@@ -6,10 +6,24 @@ from sqlalchemy import create_engine
 from sqlalchemy import func
 from sqlite3 import dbapi2 as sqlite
 from random import shuffle
-import sys
+from birdy.twitter import UserClient
+from time import sleep
+import sys, traceback, logging
 
 e = create_engine('sqlite+pysqlite:///proverbaro.db', module=sqlite, encoding="utf-8")
+tp = None
+
+def init_proverbaro(consumer_key, consumer_secret, access_token, access_token_key):
+    tp = TwitterPublisher(consumer_key, consumer_secret,
+                    access_token, access_token_key)
 Base = declarative_base()
+
+logger = logging.getLogger(__name__)
+class TwitterPublisher(object):
+    def __init__(self, consumer_key, consumer_secret, access_token, access_token_key):
+        self.client = UserClient(consumer_key, consumer_secret, access_token, access_token_key)
+    def post(self, proverb):
+        return self.client.api.statuses.update.post(status=proverb)
 
 class Proverb(Base):
     __tablename__ = "Proverbs"
@@ -18,17 +32,20 @@ class Proverb(Base):
     shown_times = Column(Integer, default=0, nullable=False)
 
 def fetch_next_proverb(session):
-    return session.query(Proverb).filter(Proverb.shown_times == s.query(func.min(Proverb.shown_times))).order_by(func.random()).first()
+    return session.query(Proverb).filter(Proverb.shown_times == session.query(func.min(Proverb.shown_times))).order_by(func.random()).first()
 
 def show_proverb():
         session = Session(bind=e)
         try:
             proverb = fetch_next_proverb(session)
             proverb.shown_times += 1
+            tp.post(proverb.text)
             session.commit()
-            print proverb.text.encode("utf-8")
+            logger.warning(proverb.text.encode("utf-8"))
         except:
-            print sys.exc_info()
+            traceback.print_exc(file=sys.stdout)
+            logger.exception('Exception while posting', exc_info=True)
+
             session.rollback()
         finally:
             session.close()
