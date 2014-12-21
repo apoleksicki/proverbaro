@@ -49,6 +49,3 @@ def show_proverb():
             session.rollback()
         finally:
             session.close()
-
-if __name__ == '__main__':
-    show_proverb()
