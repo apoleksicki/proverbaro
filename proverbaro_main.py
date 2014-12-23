@@ -13,6 +13,8 @@ if __name__ == '__main__':
     parser.add_argument('consumer_secret', help='The consumer secret of the aplication')
     parser.add_argument('access_token', help='The access token')
     parser.add_argument('access_token_key', help='The access token secret')
+    parser.add_argument('-d', '--delay', type=int, help='Delay in seconds between posting proverbs')
+    parser.add_argument('-l', '--limit', type=int, help='Number of posts to show')
     args = parser.parse_args()
     proverbaro.init_proverbaro(args.consumer_key, args.consumer_secret, args.access_token, args.access_token_key)
     proverbaro.show_proverb()
