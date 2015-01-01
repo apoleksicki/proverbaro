@@ -14,11 +14,6 @@ e = create_engine('sqlite+pysqlite:///proverbaro.db', module=sqlite, encoding="u
 
 logger = logging.getLogger(__name__)
 
-def init_proverbaro(consumer_key, consumer_secret, access_token, access_token_key):
-    global tp
-    tp = TwitterPublisher(consumer_key, consumer_secret,
-                    access_token, access_token_key)
-
 Base = declarative_base()
 
 class TwitterPublisher(object):
@@ -39,11 +34,6 @@ class Proverb(Base):
 
 def fetch_next_proverb(session):
     return session.query(Proverb).filter(Proverb.shown_times == session.query(func.min(Proverb.shown_times))).order_by(func.random()).first()
-
-def post_tweet(proverb, consumer_key, consumer_secret, access_token, access_token_key):
-    client = UserClient(consumer_key, consumer_secret, access_token, access_token_key)
-    return client.api.statuses.update.post(status=proverb)
-
 
 def show_proverb(publisher):
         session = Session(bind=e)
