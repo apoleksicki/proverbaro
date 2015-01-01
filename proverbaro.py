@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import Column, Integer, Unicode
+from sqlalchemy import Column, Integer, Unicode, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
@@ -7,7 +7,8 @@ from sqlalchemy import func
 from sqlite3 import dbapi2 as sqlite
 from random import shuffle
 from birdy.twitter import UserClient
-from time import sleep
+from datetime import datetime
+
 import sys, traceback, logging
 
 e = create_engine('sqlite+pysqlite:///proverbaro.db', module=sqlite, encoding="utf-8")
@@ -31,6 +32,7 @@ class Proverb(Base):
     id = Column(Integer, primary_key=True)
     text = Column(Unicode, nullable=False)
     shown_times = Column(Integer, default=0, nullable=False)
+    shown_last_time = Column(DateTime, default=None)
 
 def fetch_next_proverb(session):
     return session.query(Proverb).filter(Proverb.shown_times == session.query(func.min(Proverb.shown_times))).order_by(func.random()).first()
@@ -40,6 +42,7 @@ def show_proverb(publisher):
         try:
             proverb = fetch_next_proverb(session)
             proverb.shown_times += 1
+            proverb.shown_last_time = datetime.now()
             publisher.post_tweet(proverb.text)
             session.commit()
             logger.warning(proverb.text.encode("utf-8").rstrip())

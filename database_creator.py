@@ -6,13 +6,13 @@ def create_database():
     print 'Proverbaro database created'
     with conn:
         conn.execute('DROP TABLE if exists Proverbs')
-        conn.execute('CREATE TABLE Proverbs(id INTEGER PRIMARY KEY, text TEXT, shown_times INTEGER DEFAULT 0)')
+        conn.execute('CREATE TABLE Proverbs(id INTEGER PRIMARY KEY, text TEXT, shown_times INTEGER DEFAULT 0, shown_last_time TEXT DEFAULT null)')
         with open('output.txt', 'r') as proverbs_file:
             for proverb in proverbs_file:
                 conn.execute('INSERT INTO Proverbs(text) VALUES (\'%s\');' % proverb.replace('\'', '\'\''))
 
-
-create_database()
+if __name__ == '__main__':
+    create_database()
 
 
 
