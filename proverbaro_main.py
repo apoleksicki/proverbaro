@@ -15,14 +15,14 @@ logging.getLogger('').addHandler(console)
 day = 24 * 60 * 60
 
 def show_proverbs(delay, limit, consumer_key, consumer_secret, access_token, access_token_key):
+    publisher = proverbaro.TwitterPublisher(consumer_key, consumer_secret, access_token, access_token_key)
     if limit == None:
         while True:
-            proverbaro.show_proverb(consumer_key, consumer_secret, access_token, access_token_key)
+            proverbaro.show_proverb(publisher)
             sleep(delay)
     else:
-        pass
         for i in range(limit):
-            proverbaro.show_proverb(consumer_key, consumer_secret, access_token, access_token_key)
+            proverbaro.show_proverb(publisher)
             sleep(delay)
 
 if __name__ == '__main__':

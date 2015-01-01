@@ -23,9 +23,13 @@ Base = declarative_base()
 
 class TwitterPublisher(object):
     def __init__(self, consumer_key, consumer_secret, access_token, access_token_key):
-        self.client = UserClient(consumer_key, consumer_secret, access_token, access_token_key)
-    def post(self, proverb):
-        return self.client.api.statuses.update.post(status=proverb)
+        self.consumer_key = consumer_key
+        self.consumer_secret = consumer_secret
+        self.access_token = access_token
+        self.access_token_key = access_token_key
+    def post_tweet(self, proverb):
+        client = UserClient(self.consumer_key, self.consumer_secret, self.access_token, self.access_token_key)
+        return client.api.statuses.update.post(status=proverb)
 
 class Proverb(Base):
     __tablename__ = "Proverbs"
@@ -41,12 +45,12 @@ def post_tweet(proverb, consumer_key, consumer_secret, access_token, access_toke
     return client.api.statuses.update.post(status=proverb)
 
 
-def show_proverb(consumer_key, consumer_secret, access_token, access_token_key):
+def show_proverb(publisher):
         session = Session(bind=e)
         try:
             proverb = fetch_next_proverb(session)
             proverb.shown_times += 1
-            post_tweet(proverb.text, consumer_key, consumer_secret, access_token, access_token_key)
+            publisher.post_tweet(proverb.text)
             session.commit()
             logger.warning(proverb.text.encode("utf-8").rstrip())
         except:
