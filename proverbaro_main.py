@@ -14,15 +14,15 @@ logging.getLogger('').addHandler(console)
 
 day = 24 * 60 * 60
 
-def show_proverbs(delay, limit):
+def show_proverbs(delay, limit, consumer_key, consumer_secret, access_token, access_token_key):
     if limit == None:
         while True:
-            proverbaro.show_proverb()
+            proverbaro.show_proverb(consumer_key, consumer_secret, access_token, access_token_key)
             sleep(delay)
     else:
         pass
         for i in range(limit):
-            proverbaro.show_proverb()
+            proverbaro.show_proverb(consumer_key, consumer_secret, access_token, access_token_key)
             sleep(delay)
 
 if __name__ == '__main__':
@@ -43,4 +43,4 @@ if __name__ == '__main__':
         limit = args.limit
 
 
-    show_proverbs(delay, limit)
+    show_proverbs(delay, limit, args.consumer_key, args.consumer_secret, args.access_token, args.access_token_key)

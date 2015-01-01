@@ -36,12 +36,17 @@ class Proverb(Base):
 def fetch_next_proverb(session):
     return session.query(Proverb).filter(Proverb.shown_times == session.query(func.min(Proverb.shown_times))).order_by(func.random()).first()
 
-def show_proverb():
+def post_tweet(proverb, consumer_key, consumer_secret, access_token, access_token_key):
+    client = UserClient(consumer_key, consumer_secret, access_token, access_token_key)
+    return client.api.statuses.update.post(status=proverb)
+
+
+def show_proverb(consumer_key, consumer_secret, access_token, access_token_key):
         session = Session(bind=e)
         try:
             proverb = fetch_next_proverb(session)
             proverb.shown_times += 1
-            tp.post(proverb.text)
+            post_tweet(proverb.text, consumer_key, consumer_secret, access_token, access_token_key)
             session.commit()
             logger.warning(proverb.text.encode("utf-8").rstrip())
         except:
