@@ -34,13 +34,10 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--delay', type=int, help='Delay in seconds between posting proverbs')
     parser.add_argument('-l', '--limit', type=int, help='Number of posts to show')
     args = parser.parse_args()
-    proverbaro.init_proverbaro(args.consumer_key, args.consumer_secret, args.access_token, args.access_token_key)
     delay = day
     limit = None
     if args.delay:
         delay = args.delay
     if args.limit:
         limit = args.limit
-
-
     show_proverbs(delay, limit, args.consumer_key, args.consumer_secret, args.access_token, args.access_token_key)
