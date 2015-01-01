@@ -7,7 +7,9 @@ from time import sleep
 
 FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(filename='proverbaro.log', format=FORMAT)
-console = logging.StreamHolder()
+console = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s - %(name)s: %(message)s')
+console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
 
 day = 24 * 60 * 60
