@@ -7,7 +7,7 @@ from sqlalchemy import func
 from sqlite3 import dbapi2 as sqlite
 from random import shuffle
 from birdy.twitter import UserClient
-from datetime import datetime
+import datetime
 
 import sys, traceback, logging
 
@@ -37,12 +37,29 @@ class Proverb(Base):
 def fetch_next_proverb(session):
     return session.query(Proverb).filter(Proverb.shown_times == session.query(func.min(Proverb.shown_times))).order_by(func.random()).first()
 
+def _fetch_last_post_date(session):
+    return session.query(func.max(Proverb.shown_last_time)).first()[0]
+
+def fetch_delta_from_last_post():
+        session = Session(bind=e)
+        try:
+            lastpost = _fetch_last_post_date(session)
+            delta = datetime.datetime.today() -lastpost
+            logger.warning('Last post was %d seconds ago', delta.total_seconds())
+            return delta.total_seconds()
+        except:
+            logger.exception('Exception while posting', exc_info=True)
+
+            session.rollback()
+        finally:
+            session.close()
+
 def show_proverb(publisher):
         session = Session(bind=e)
         try:
             proverb = fetch_next_proverb(session)
             proverb.shown_times += 1
-            proverb.shown_last_time = datetime.now()
+            proverb.shown_last_time = datetime.datetime.now()
             publisher.post_tweet(proverb.text)
             session.commit()
             logger.warning(proverb.text.encode("utf-8").rstrip())
