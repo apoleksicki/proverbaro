@@ -40,7 +40,10 @@ def show_proverbs(delay, limit, consumer_key, consumer_secret, access_token, acc
     else:
         for i in range(limit):
             proverbaro.show_proverb(publisher)
-            sleep(delay)
+            if i != limit - 1:
+                sleep(delay)
+            else:
+                logger.warning('Last proverb has been shown')
 
 if __name__ == '__main__':
     parser  = argparse.ArgumentParser(description='Proverbaro')
