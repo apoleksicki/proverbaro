@@ -8,7 +8,6 @@ from sqlite3 import dbapi2 as sqlite
 from random import shuffle
 from birdy.twitter import UserClient
 import datetime
-
 import sys, traceback, logging
 
 e = create_engine('sqlite+pysqlite:///proverbaro.db', module=sqlite, encoding="utf-8")
