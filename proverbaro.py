@@ -57,10 +57,14 @@ def fetch_delta_from_last_post():
         session = Session(bind=e)
         try:
             lastpost = _fetch_last_post_date(session)
-            delta = datetime.datetime.today() - lastpost
-            logger.warning('Last post was %d seconds ago',
-                           delta.total_seconds())
-            return delta.total_seconds()
+            if lastpost is not None:
+                delta = datetime.datetime.today() - lastpost
+                logger.warning('Last post was %d seconds ago',
+                               delta.total_seconds())
+                return delta.total_seconds()
+            else:
+                logger.warning('First run, no posts have been shown')
+                return None
         except:
             logger.exception('Exception while posting', exc_info=True)
             session.rollback()

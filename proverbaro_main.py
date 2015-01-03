@@ -19,7 +19,8 @@ day = 24 * 60 * 60
 
 def calculate_remaining_delay(delay):
     delta = proverbaro.fetch_delta_from_last_post()
-    logger.debug('Delta: %d' % delta)
+    if delta is not None:
+        logger.debug('Delta: %d' % delta)
     logger.debug('Delay: %d' % delay)
     if delta is not None and delay > delta:
         return delay - delta
