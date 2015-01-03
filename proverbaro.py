@@ -36,11 +36,20 @@ class TwitterPublisher(object):
 
 
 class Proverb(Base):
-    __tablename__ = "Proverbs"
+    __tablename__ = 'Proverbs'
     id = Column(Integer, primary_key=True)
     text = Column(Unicode, nullable=False)
     shown_times = Column(Integer, default=0, nullable=False)
     shown_last_time = Column(DateTime, default=None)
+
+
+class PostId(Base):
+    __tablename__ = 'Post_Ids'
+    id = Column(Integer, primary_key=True)
+    publish_date = Column(DateTime, nullable=False)
+    publish_id = Column(Integer, nullable=False)
+    proverb_id = Column(Integer, ForeignKey('Proverbs.id'), nullable=False)
+
 
 
 def fetch_next_proverb(session):

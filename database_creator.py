@@ -15,5 +15,12 @@ def create_database():
                 conn.execute('INSERT INTO Proverbs(text) VALUES (\'%s\');'
                              % proverb.replace('\'', '\'\''))
 
+        conn.execute('DROP TABLE if exists Post_Ids')
+        conn.execute('CREATE TABLE Post_Ids(id INTEGER PRIMARY KEY, '
+                     'publish_date TEXT NOT NULL, '
+                     'publish_id INTEGER NOT NULL, '
+                     'proverb_id INTEGER NOT NULL REFERENCES Proverbs (id))')
+
+
 if __name__ == '__main__':
     create_database()
