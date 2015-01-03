@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import Column, Integer, Unicode, DateTime
+from sqlalchemy import Column, Integer, Unicode, DateTime, Date, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
@@ -45,11 +45,32 @@ class Proverb(Base):
 
 class PostId(Base):
     __tablename__ = 'Post_Ids'
+
+    def __init__(self, publish_date, publish_id, proverb_id):
+        self.publish_date = publish_date
+        self.publish_id = publish_id
+        self.proverb_id = proverb_id
+
     id = Column(Integer, primary_key=True)
-    publish_date = Column(DateTime, nullable=False)
+    publish_date = Column(Date, nullable=False)
     publish_id = Column(Integer, nullable=False)
     proverb_id = Column(Integer, ForeignKey('Proverbs.id'), nullable=False)
 
+
+def _calculate_publish_id(date, session):
+    currentId = session.query(func.max(PostId.publish_id)).filter(
+        PostId.publish_date == date).first()[0]
+    if currentId is None:
+        currentId = 1
+    else:
+        currentId += 1
+    return currentId
+
+
+def _create_PostId(session, proverbId):
+    today = datetime.date.today()
+    publishId = _calculate_publish_id(today, session)
+    return PostId(today, publishId, proverbId)
 
 
 def fetch_next_proverb(session):
@@ -88,6 +109,7 @@ def show_proverb(publisher):
             proverb.shown_times += 1
             proverb.shown_last_time = datetime.datetime.now()
             publisher.post_tweet(proverb.text)
+            session.add(_create_PostId(session, proverb.id))
             session.commit()
             logger.warning(proverb.text.encode("utf-8").rstrip())
         except:
