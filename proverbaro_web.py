@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import desc, and_
 
@@ -13,6 +13,7 @@ class Proverb(db.Model):
     text = db.Column(db.Unicode, nullable=False)
     shown_times = db.Column(db.Integer, default=0, nullable=False)
     shown_last_time = db.Column(db.DateTime, default=None)
+
 
 class PostId(db.Model):
     __tablename__ = 'Post_Ids'
@@ -31,9 +32,14 @@ class PostId(db.Model):
 
 @app.route('/<date>/<int:publish_id>')
 def show_proverb(date, publish_id):
-    return Proverb.query.join(PostId).filter(and_(
+
+    proverb =  Proverb.query.join(PostId).filter(and_(
             PostId.publish_date == date,
-            PostId.publish_id == publish_id)).first().text
+            PostId.publish_id == publish_id)).first()
+
+    return render_template('proverb.html',
+                           proverb = proverb.text
+                           if proverb is not None else None)
 
 if __name__ == '__main__':
     app.run(debug=True)
