@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 
-from translation_util import find_definition, _parse_single_definition
+from translation_util import _find_definition, _find_full_definition
 
 def _read_json(filename):
     with open('test_resources\%s' % filename, 'r') as f:
@@ -22,5 +22,5 @@ def test_convert_saluti_definition_1():
 
 def test_find_definition_of_saluti():
     expected = _read_json('converted_saluti.json')
-    salutidef = find_definition('saluti', _read_saluti_json('saluti.json'))
+    salutidef = _find_full_definition('saluti', _read_saluti_json('saluti.json'))
     assert expected == salutidef

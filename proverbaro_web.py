@@ -1,6 +1,17 @@
+import logging
 from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import desc, and_
+from translation_util import find_definition
+
+FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig(filename='proverbaro.log', format=FORMAT)
+console = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s - %(name)s: %(message)s')
+console.setFormatter(formatter)
+logging.getLogger('').addHandler(console)
+
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///proverbaro.db'
@@ -36,10 +47,14 @@ def show_proverb(date, publish_id):
     proverb =  Proverb.query.join(PostId).filter(and_(
             PostId.publish_date == date,
             PostId.publish_id == publish_id)).first()
+    definition1 = None
+    if proverb is not None:
+        definition1 = find_definition(proverb.text.split()[0])
 
     return render_template('proverb.html',
                            proverb = proverb.text
-                           if proverb is not None else None)
+                           if proverb is not None else None,
+                          definition = definition1)
 
 if __name__ == '__main__':
     app.run(debug=True)
