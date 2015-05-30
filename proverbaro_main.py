@@ -36,9 +36,10 @@ def execute_remaining_delay(delay):
 
 
 def show_proverbs(delay, limit, consumer_key, consumer_secret, access_token,
-                  access_token_key):
+                  access_token_key, hashtag):
     publisher = proverbaro.TwitterPublisher(consumer_key, consumer_secret,
-                                            access_token, access_token_key)
+                                            access_token, access_token_key,
+                                            hashtag)
     if limit is None:
         while True:
             proverbaro.show_proverb(publisher)
@@ -53,6 +54,7 @@ def show_proverbs(delay, limit, consumer_key, consumer_secret, access_token,
 
 
 if __name__ == '__main__':
+    #TODO move logic to a separate function
     parser = argparse.ArgumentParser(description='Proverbaro')
     parser.add_argument('consumer_key', help='The consumer key of'
                         'the aplication')
@@ -67,6 +69,8 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--force', help='Forces posting of the first'
                         'proverb without checking the delay',
                         action="store_true")
+    parser.add_argument('-t', '--tag', default='bar', 
+                        help='A hashtag attached to each tweet. #Esperanto by default' )
     args = parser.parse_args()
     delay = day
     limit = None
@@ -78,4 +82,4 @@ if __name__ == '__main__':
         execute_remaining_delay(delay)
 
     show_proverbs(delay, limit, args.consumer_key, args.consumer_secret,
-                  args.access_token, args.access_token_key)
+                  args.access_token, args.access_token_key, args.tag)

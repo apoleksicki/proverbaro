@@ -23,16 +23,17 @@ Base = declarative_base()
 
 class TwitterPublisher(object):
     def __init__(self, consumer_key, consumer_secret, access_token,
-                 access_token_key):
+                 access_token_key, hashtag):
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
         self.access_token = access_token
         self.access_token_key = access_token_key
+        self.hashtag = hashtag
 
     def post_tweet(self, proverb):
         client = UserClient(self.consumer_key, self.consumer_secret,
                             self.access_token, self.access_token_key)
-        return client.api.statuses.update.post(status=proverb)
+        return client.api.statuses.update.post(status='%s #%s' % (proverb, self.hashtag))
 
 
 class Proverb(Base):
