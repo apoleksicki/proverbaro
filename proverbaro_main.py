@@ -69,7 +69,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--force', help='Forces posting of the first'
                         'proverb without checking the delay',
                         action="store_true")
-    parser.add_argument('-t', '--tag', default='bar', 
+    parser.add_argument('-t', '--tag', default='esperanto', 
                         help='A hashtag attached to each tweet. #Esperanto by default' )
     args = parser.parse_args()
     delay = day
