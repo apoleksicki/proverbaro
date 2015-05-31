@@ -53,8 +53,7 @@ def show_proverbs(delay, limit, consumer_key, consumer_secret, access_token,
                 logger.warning('Last proverb has been shown')
 
 
-if __name__ == '__main__':
-    #TODO move logic to a separate function
+def main():
     parser = argparse.ArgumentParser(description='Proverbaro')
     parser.add_argument('consumer_key', help='The consumer key of'
                         'the aplication')
@@ -83,3 +82,6 @@ if __name__ == '__main__':
 
     show_proverbs(delay, limit, args.consumer_key, args.consumer_secret,
                   args.access_token, args.access_token_key, args.tag)
+
+if __name__ == '__main__':
+    main()
