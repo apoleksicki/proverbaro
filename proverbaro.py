@@ -46,17 +46,15 @@ class Proverb(Base):
 
 class PostId(Base):
     __tablename__ = 'Post_Ids'
-
-    def __init__(self, publish_date, publish_id, proverb_id):
-        self.publish_date = publish_date
-        self.publish_id = publish_id
-        self.proverb_id = proverb_id
-
     id = Column(Integer, primary_key=True)
     publish_date = Column(Date, nullable=False)
     publish_id = Column(Integer, nullable=False)
     proverb_id = Column(Integer, ForeignKey('Proverbs.id'), nullable=False)
 
+    def __init__(self, publish_date, publish_id, proverb_id):
+        self.publish_date = publish_date
+        self.publish_id = publish_id
+        self.proverb_id = proverb_id
 
 def _calculate_publish_id(date, session):
     currentId = session.query(func.max(PostId.publish_id)).filter(

@@ -28,23 +28,21 @@ class Proverb(db.Model):
 
 class PostId(db.Model):
     __tablename__ = 'Post_Ids'
-
-    def __init__(self, publish_date, publish_id, proverb_id):
-        self.publish_date = publish_date
-        self.publish_id = publish_id
-        self.proverb_id = proverb_id
-
     id = db.Column(db.Integer, primary_key=True)
     publish_date = db.Column(db.Date, nullable=False)
     publish_id = db.Column(db.Integer, nullable=False)
     proverb_id = db.Column(db.Integer, db.ForeignKey('Proverbs.id'),
                            nullable=False)
 
+    def __init__(self, publish_date, publish_id, proverb_id):
+        self.publish_date = publish_date
+        self.publish_id = publish_id
+        self.proverb_id = proverb_id
+
 
 @app.route('/<date>/<int:publish_id>')
 def show_proverb(date, publish_id):
-
-    proverb =  Proverb.query.join(PostId).filter(and_(
+    proverb = Proverb.query.join(PostId).filter(and_(
             PostId.publish_date == date,
             PostId.publish_id == publish_id)).first()
     definition1 = None
@@ -52,9 +50,10 @@ def show_proverb(date, publish_id):
         definition1 = find_definition(proverb.text.split()[0])
 
     return render_template('proverb.html',
-                           proverb = proverb.text
+                           proverb=proverb.text
                            if proverb is not None else None,
-                          definition = definition1)
+                          definition=definition1)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
