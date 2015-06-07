@@ -1,5 +1,5 @@
 import logging
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import desc, and_
 from translation_util import find_definition
@@ -53,6 +53,12 @@ def show_proverb(date, publish_id):
                            proverb=proverb.text
                            if proverb is not None else None,
                           definition=definition1)
+
+
+@app.route('/')
+def function():
+    post = PostId.query.order_by(desc(PostId.publish_date), desc(PostId.publish_id)).first()
+    return show_proverb(post.publish_date, post.publish_id)   
 
 
 if __name__ == '__main__':
