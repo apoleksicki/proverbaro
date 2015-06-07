@@ -61,5 +61,20 @@ def function():
     return show_proverb(post.publish_date, post.publish_id)   
 
 
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+
+@app.route('/shutdown')
+def shutdown():
+    if app.debug:
+        shutdown_server()
+        return 'Server shutting down...'
+    else:
+        return 'Cannot shut down, not in debug mode.'        
+
+
 if __name__ == '__main__':
     app.run(debug=True)
