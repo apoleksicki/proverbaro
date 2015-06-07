@@ -1,0 +1,7 @@
+<!doctype html>
+<dl>
+      {% for date, posts in proverbs.iteritems() %}
+            <dt>{{ date }}</dt>
+            <dd>{{ posts }}</dd>
+      {% endfor %}
+</dl>

@@ -1,8 +1,9 @@
 import logging
 from flask import Flask, render_template, request
 from flask.ext.sqlalchemy import SQLAlchemy
-from sqlalchemy import desc, and_
+from sqlalchemy import desc, and_, between
 from translation_util import find_definition
+from datetime import timedelta
 
 FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(filename='proverbaro.log', format=FORMAT)
@@ -18,14 +19,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///proverbaro.db'
 db = SQLAlchemy(app)
 
 
-class Proverb(db.Model):
-    __tablename__ = "Proverbs"
-    id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.Unicode, nullable=False)
-    shown_times = db.Column(db.Integer, default=0, nullable=False)
-    shown_last_time = db.Column(db.DateTime, default=None)
-
-
 class PostId(db.Model):
     __tablename__ = 'Post_Ids'
     id = db.Column(db.Integer, primary_key=True)
@@ -38,6 +31,15 @@ class PostId(db.Model):
         self.publish_date = publish_date
         self.publish_id = publish_id
         self.proverb_id = proverb_id
+
+
+class Proverb(db.Model):
+    __tablename__ = "Proverbs"
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Unicode, nullable=False)
+    shown_times = db.Column(db.Integer, default=0, nullable=False)
+    shown_last_time = db.Column(db.DateTime, default=None)
+    posts = db.relationship(PostId, backref='Proverb')
 
 
 @app.route('/<date>/<int:publish_id>')
@@ -55,10 +57,28 @@ def show_proverb(date, publish_id):
                           definition=definition1)
 
 
+def _reduce_to_dictionary(dict, post_tuple):
+    date = post_tuple[0]
+    if not dict.has_key(date):
+        dict[date] = []
+    dict[date].append(post_tuple[1:])
+    return dict
+
+
+def _fetch_latest_postId():
+    return PostId.query.order_by(desc(PostId.publish_date), desc(PostId.publish_id)).first()
+
+
 @app.route('/')
-def function():
-    post = PostId.query.order_by(desc(PostId.publish_date), desc(PostId.publish_id)).first()
-    return show_proverb(post.publish_date, post.publish_id)   
+def home():
+    latest = _fetch_latest_postId()
+    toDate = latest.publish_date
+    fromDate = toDate - timedelta(3)
+    posts = PostId.query.filter(between(PostId.publish_date, fromDate, toDate))\
+    .order_by(desc(PostId.publish_date), PostId.publish_id).all()
+    post_tuples = [(post.publish_date, post.publish_id, post.Proverb.text) for post in posts]
+    proverbDictionary = reduce(_reduce_to_dictionary, post_tuples, {})
+    return render_template('main.html', proverbs = proverbDictionary)   
 
 
 def shutdown_server():
@@ -66,6 +86,7 @@ def shutdown_server():
     if func is None:
         raise RuntimeError('Not running with the Werkzeug Server')
     func()
+
 
 @app.route('/shutdown')
 def shutdown():
