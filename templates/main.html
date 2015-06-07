@@ -2,6 +2,8 @@
 <dl>
       {% for date, posts in proverbs.iteritems() %}
             <dt>{{ date }}</dt>
-            <dd>{{ posts }}</dd>
+            {% for post in posts %}
+            <dd>{{ post[0] }}. {{ post[1] }}</dd>
+            {% endfor %}
       {% endfor %}
 </dl>
