@@ -3,6 +3,7 @@ from flask import Flask, render_template, request
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import desc, and_, between
 from translation_util import find_definition
+from collections import OrderedDict
 from datetime import timedelta
 
 FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -77,7 +78,7 @@ def home():
     posts = PostId.query.filter(between(PostId.publish_date, fromDate, toDate))\
     .order_by(desc(PostId.publish_date), PostId.publish_id).all()
     post_tuples = [(post.publish_date, post.publish_id, post.Proverb.text) for post in posts]
-    proverbDictionary = reduce(_reduce_to_dictionary, post_tuples, {})
+    proverbDictionary = reduce(_reduce_to_dictionary, post_tuples, OrderedDict())
     return render_template('main.html', proverbs = proverbDictionary)   
 
 
