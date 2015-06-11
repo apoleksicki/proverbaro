@@ -3,7 +3,9 @@
       {% for date, posts in proverbs.iteritems() %}
             <dt>{{ date }}</dt>
             {% for post in posts %}
-            <dd>{{ post[0] }}. {{ post[1] }}</dd>
+            <dd>
+            	<a href={{url_for('show_proverb',date=date , publish_id =  post[0] )}}>{{ post[0] }}. {{ post[1] }}</a>
+            </dd>
             {% endfor %}
       {% endfor %}
 </dl>
