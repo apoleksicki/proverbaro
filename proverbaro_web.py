@@ -79,7 +79,7 @@ def home():
     .order_by(desc(PostId.publish_date), PostId.publish_id).all()
     post_tuples = [(post.publish_date, post.publish_id, post.Proverb.text) for post in posts]
     proverbDictionary = reduce(_reduce_to_dictionary, post_tuples, OrderedDict())
-    return render_template('main.html', proverbs = proverbDictionary)   
+    return render_template('index.html', proverbs = proverbDictionary)   
 
 
 def shutdown_server():
