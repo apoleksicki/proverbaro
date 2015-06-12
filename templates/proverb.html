@@ -5,5 +5,20 @@
 {% else %}
   <h1>Neniu trovita!</h1>
 {% endif %}
+<h3>Difino de '{{definition['word']}}'</h3>
+<ul>
+	{% for df in definition['definitions'] %}
+		<li>{{ df['definition'] }}</li>
+		<h4>Ekzemploj</h4>
+			<ul>
+			{% for example in df['examples'] %}
+			<li>{{ example['example'] }}</li>
+			{% endfor %}
+			</ul>
+	{% endfor %}
+</ul>	
+
+
 <h1>{{ definition }}</h1>
+
 
