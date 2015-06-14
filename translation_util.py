@@ -2,6 +2,7 @@
 import logging
 import urllib
 import json
+import pytest
 
 def _get_json(url):
     print url
@@ -42,9 +43,30 @@ def _lookup_word(word, find_function):
         return precise[0]
 
 
+def _remove_grammatical_endings(word):
+    #Removes plural and accustive ending from the word
+    if word[-1] == 'j':
+        return word[:-1]
+    if word[-1] == 'n':
+        if word[-2] == 'j':
+            return word[:-2]
+        else:
+            return word[:-1]
+
 def find_definition(word):
     lookupResult = _lookup_word(word, _lookup)
     if lookupResult is not None:
         return _find_full_definition(lookupResult, _find_definition)
     else:
         return None
+
+
+class TestEndingStriping(object):
+    def test_plural_removal(self):
+        assert 'patro' == _remove_grammatical_endings('patroj')
+    
+    def test_accusative_removal(self):
+        assert 'patro' == _remove_grammatical_endings('patron')
+    
+    def test_plural_and_accusative_removal(self):
+        assert 'patro' == _remove_grammatical_endings('patrojn')        
