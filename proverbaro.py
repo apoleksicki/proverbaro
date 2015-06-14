@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import Column, Integer, Unicode, DateTime, Date, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, relationship
 from sqlalchemy import create_engine
 from sqlalchemy import func
 from sqlite3 import dbapi2 as sqlite
-from random import shuffle
 from birdy.twitter import UserClient
 import datetime
 import sys
@@ -33,7 +32,22 @@ class TwitterPublisher(object):
     def post_tweet(self, proverb):
         client = UserClient(self.consumer_key, self.consumer_secret,
                             self.access_token, self.access_token_key)
-        return client.api.statuses.update.post(status='%s #%s' % (proverb, self.hashtag))
+        return client.api.statuses.update.post(status='%s #%s' %\
+         (proverb, self.hashtag))
+
+
+class WordDefinition(Base):
+    __tablename__ = 'Word_Definitions'
+    id = Column(Integer, primary_key=True)
+    word = Column(Unicode, nullable=False)
+    definiton = Column(Unicode, nullable=False)
+
+class ProverbToWord(Base):
+    __tablename__ = 'Proverbs_To_Words'
+    id = Column(Integer, primary_key = True)
+    proverb_id = Column(Integer, ForeignKey('Proverbs.id'), nullable=False)
+    definition_id = Column(Integer, ForeignKey('Word_Definitions.id'),\
+        nullable=False)
 
 
 class Proverb(Base):
@@ -42,6 +56,7 @@ class Proverb(Base):
     text = Column(Unicode, nullable=False)
     shown_times = Column(Integer, default=0, nullable=False)
     shown_last_time = Column(DateTime, default=None)
+    definitions = relationship('WordDefinition', secondary=ProverbToWord)
 
 
 class PostId(Base):
@@ -55,6 +70,10 @@ class PostId(Base):
         self.publish_date = publish_date
         self.publish_id = publish_id
         self.proverb_id = proverb_id
+
+def create_tables():
+    Base.metadata.create_all(e)
+
 
 def _calculate_publish_id(date, session):
     currentId = session.query(func.max(PostId.publish_id)).filter(
@@ -114,7 +133,10 @@ def show_proverb(publisher):
     except:
         traceback.print_exc(file=sys.stdout)
         logger.exception('Exception while posting', exc_info=True)
-
         session.rollback()
     finally:
         session.close()
+
+
+if __name__ == '__main__':
+    create_tables()        
