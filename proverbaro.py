@@ -83,38 +83,38 @@ def _fetch_last_post_date(session):
 
 
 def fetch_delta_from_last_post():
-        session = Session(bind=e)
-        try:
-            lastpost = _fetch_last_post_date(session)
-            if lastpost is not None:
-                delta = datetime.datetime.today() - lastpost
-                logger.warning('Last post was %d seconds ago',
-                               delta.total_seconds())
-                return delta.total_seconds()
-            else:
-                logger.warning('First run, no posts have been shown')
-                return None
-        except:
-            logger.exception('Exception while posting', exc_info=True)
-            session.rollback()
-        finally:
-            session.close()
+    session = Session(bind=e)
+    try:
+        lastpost = _fetch_last_post_date(session)
+        if lastpost is not None:
+            delta = datetime.datetime.today() - lastpost
+            logger.warning('Last post was %d seconds ago',
+                           delta.total_seconds())
+            return delta.total_seconds()
+        else:
+            logger.warning('First run, no posts have been shown')
+            return None
+    except:
+        logger.exception('Exception while posting', exc_info=True)
+        session.rollback()
+    finally:
+        session.close()
 
 
 def show_proverb(publisher):
-        session = Session(bind=e)
-        try:
-            proverb = fetch_next_proverb(session)
-            proverb.shown_times += 1
-            proverb.shown_last_time = datetime.datetime.now()
-            publisher.post_tweet(proverb.text)
-            session.add(_create_PostId(session, proverb.id))
-            session.commit()
-            logger.warning(proverb.text.encode("utf-8").rstrip())
-        except:
-            traceback.print_exc(file=sys.stdout)
-            logger.exception('Exception while posting', exc_info=True)
+    session = Session(bind=e)
+    try:
+        proverb = fetch_next_proverb(session)
+        proverb.shown_times += 1
+        proverb.shown_last_time = datetime.datetime.now()
+        publisher.post_tweet(proverb.text)
+        session.add(_create_PostId(session, proverb.id))
+        session.commit()
+        logger.warning(proverb.text.encode("utf-8").rstrip())
+    except:
+        traceback.print_exc(file=sys.stdout)
+        logger.exception('Exception while posting', exc_info=True)
 
-            session.rollback()
-        finally:
-            session.close()
+        session.rollback()
+    finally:
+        session.close()
