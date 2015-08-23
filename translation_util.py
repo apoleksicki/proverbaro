@@ -15,8 +15,19 @@ def _find_definition(word):
     return _get_json("http://www.simplavortaro.org/api/v1/vorto/%s" % word)
 
 
+def _parse_subdefinitions(subdefinitions):
+    """Parses subdefinitions of a word"""
+    parsed = {'definition' : subdefinitions['difino']}
+    parsed['examples'] = [{'example' : example['ekzemplo']}
+                          for example in subdefinitions['ekzemploj']]
+    return parsed
+
 def _parse_single_definition(unparsedDefinition):
+    """Parses a single definition from Eo json to the internal format"""
     parsed = {'definition' : unparsedDefinition['difino']}
+    parsed['subdefinitions'] = [_parse_subdefinitions(subdefinition)\
+        for subdefinition in unparsedDefinition['pludifinoj']]
+        
     parsed['examples'] = [{'example' : example['ekzemplo']}
                           for example in unparsedDefinition['ekzemploj']]
     return parsed
