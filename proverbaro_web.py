@@ -2,7 +2,7 @@ import logging
 from flask import Flask, render_template, request
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import desc, and_, between
-from translation_util import find_definition
+from translation_util import find_definition, split_proverb_into_words
 from collections import OrderedDict
 from datetime import timedelta
 
@@ -48,14 +48,15 @@ def show_proverb(date, publish_id):
     proverb = Proverb.query.join(PostId).filter(and_(
             PostId.publish_date == date,
             PostId.publish_id == publish_id)).first()
-    definition1 = None
+    definitions = []
     if proverb is not None:
-        definition1 = find_definition(proverb.text.split()[0])
-
+        definitions = [find_definition(split_proverb_into_words(proverb.text)[0]),
+                        find_definition(split_proverb_into_words(proverb.text)[2])]
+    print definitions                        
     return render_template('proverb.html',
                            proverb=proverb.text
                            if proverb is not None else None,
-                          definition=definition1)
+                          definitions=definitions)
 
 
 def _reduce_to_dictionary(dict, post_tuple):

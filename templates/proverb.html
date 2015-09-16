@@ -5,34 +5,40 @@
 {% else %}
   <h1>Neniu trovita!</h1>
 {% endif %}
-<h3>Difino de '{{definition['word']}}'</h3>
-<ul>
-	{% for df in definition['definitions'] %}
+Definitions
+{%if definitions %}
+	{% for definition in definitions %}
+		{%if definition %}
+			<h3>Difino de '{{definition['word']}}'</h3>
+			<ul>
+				{% for df in definition['definitions'] %}
 
-		<li>{{ df['definition'] }}</li>
-		{%if df['examples']%}
-					<ul>
-					{% for example in df['examples'] %}
-					<li>{{ example['example'] }}</li>
-					{% endfor %}
-					</ul>
+					<li>{{ df['definition'] }}</li>
+					{%if df['examples']%}
+								<ul>
+								{% for example in df['examples'] %}
+								<li>{{ example['example'] }}</li>
+								{% endfor %}
+								</ul>
+					{% endif %}
+					{% if df['subdefinitions'] %}
+						{% for sdf in df['subdefinitions'] %}
+							
+							<br>{{sdf['definition']}}</br>
+							<ul>
+								{% for example in sdf['examples'] %}
+									<li>{{ example['example'] }}</li>
+								{% endfor %}
+							</ul>
+						{% endfor %}
+					{% endif %}
+					<br></br>
+				{% endfor %}
+			</ul>
+		{#% endfor %#}
 		{% endif %}
-		{% if df['subdefinitions'] %}
-			{% for sdf in df['subdefinitions'] %}
-				
-				<br>{{sdf['definition']}}</br>
-				<ul>
-					{% for example in sdf['examples'] %}
-						<li>{{ example['example'] }}</li>
-					{% endfor %}
-				</ul>
-			{% endfor %}
-		{% endif %}
-		<br></br>
 	{% endfor %}
-</ul>	
-
-
-<h1>{{ definition }}</h1>
+{% endif %}
+<h1>{{ definitions }}</h1>
 
 
