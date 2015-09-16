@@ -2,6 +2,7 @@
 from sqlalchemy import Column, Integer, Unicode, DateTime, Date, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, relationship
+from sqlalchemy.schema import Table
 from sqlalchemy import create_engine
 from sqlalchemy import func
 from sqlite3 import dbapi2 as sqlite
@@ -36,18 +37,23 @@ class TwitterPublisher(object):
          (proverb, self.hashtag))
 
 
+proverbToWord = Table('Proverbs_To_Words', Base.metadata,
+    Column('proverb_id', Integer, ForeignKey('Proverbs.id')),
+    Column('definition_id',Integer, ForeignKey('Word_Definitions.id')))
+    #the class has to be rewritten
+    #Look http://docs.sqlalchemy.org/en/latest/orm/basic_relationships.html#many-to-many
+    # __tablename__ = 
+    # id = Column(Integer, primary_key = True)
+    # proverb_id = Column(Integer, ForeignKey('Proverbs.id'), nullable=False)
+    # definition_id = Column(Integer, ForeignKey('Word_Definitions.id'),\
+    #     nullable=False)
+
+
 class WordDefinition(Base):
     __tablename__ = 'Word_Definitions'
     id = Column(Integer, primary_key=True)
     word = Column(Unicode, nullable=False)
     definiton = Column(Unicode, nullable=False)
-
-class ProverbToWord(Base):
-    __tablename__ = 'Proverbs_To_Words'
-    id = Column(Integer, primary_key = True)
-    proverb_id = Column(Integer, ForeignKey('Proverbs.id'), nullable=False)
-    definition_id = Column(Integer, ForeignKey('Word_Definitions.id'),\
-        nullable=False)
 
 
 class Proverb(Base):
@@ -56,7 +62,9 @@ class Proverb(Base):
     text = Column(Unicode, nullable=False)
     shown_times = Column(Integer, default=0, nullable=False)
     shown_last_time = Column(DateTime, default=None)
-    definitions = relationship('WordDefinition', secondary=ProverbToWord)
+    definitions = relationship('WordDefinition', secondary=proverbToWord)
+
+
 
 
 class PostId(Base):
@@ -119,6 +127,13 @@ def fetch_delta_from_last_post():
     finally:
         session.close()
 
+
+def fetch_proverb():
+    session = Session(bind=e)
+    try:
+        return fetch_next_proverb(session)
+    finally:
+        session.close()            
 
 def show_proverb(publisher):
     session = Session(bind=e)
