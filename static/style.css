@@ -1,0 +1,26 @@
+body { 
+    font-family: sans-serif; 
+    margin-top: 15pt;
+    margin-left: 30pt;
+}
+
+h1 {
+    font-size: 30pt;
+}
+
+form ul {
+    list-style-type: none;
+}
+
+.def {
+    font-size: 15pt;
+}
+
+.def_hover { 
+    font-size: 15pt;
+    color: blue; 
+}
+
+.highlight {
+    background-color: #FFFF88;
+    }

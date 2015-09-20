@@ -1,44 +1,71 @@
 <!doctype html>
+<head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="{{
+  url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+
 <title>Proverbaro</title>
 {% if proverb %}
   <h1>{{ proverb }}</h1>
 {% else %}
   <h1>Neniu trovita!</h1>
 {% endif %}
-Definitions
 {%if definitions %}
 	{% for definition in definitions %}
 		{%if definition %}
-			<h3>Difino de '{{definition['word']}}'</h3>
-			<ul>
-				{% for df in definition['definitions'] %}
+			<h3  class = "definition" id="def{{definition['word']}}">Difino de '{{definition['word']}}'
+			<script type="text/javascript">
+				$(document).ready(function(){
+					$("#def{{definition['word']}}").click(function(){
+						$("#{{definition['word']}}").toggle();
+					});
+				});
+				$(document).ready(function(){
+					$("#def{{definition['word']}}").mouseover(function(){
+						$("#def{{definition['word']}}").toggleClass("def_hover");
+					});
+				});
+			</script>
+			</h3>
+			<div id="{{definition['word']}}">
+				<ul>
+					{% for df in definition['definitions'] %}
 
-					<li>{{ df['definition'] }}</li>
-					{%if df['examples']%}
-								<ul>
-								{% for example in df['examples'] %}
-								<li>{{ example['example'] }}</li>
-								{% endfor %}
-								</ul>
-					{% endif %}
-					{% if df['subdefinitions'] %}
-						{% for sdf in df['subdefinitions'] %}
-							
-							<br>{{sdf['definition']}}</br>
-							<ul>
-								{% for example in sdf['examples'] %}
+						<li>{{ df['definition'] }}</li>
+						{%if df['examples']%}
+									<ul>
+									{% for example in df['examples'] %}
 									<li>{{ example['example'] }}</li>
-								{% endfor %}
-							</ul>
-						{% endfor %}
-					{% endif %}
-					<br></br>
-				{% endfor %}
-			</ul>
+									{% endfor %}
+									</ul>
+						{% endif %}
+						{% if df['subdefinitions'] %}
+							{% for sdf in df['subdefinitions'] %}
+								
+								<br>{{sdf['definition']}}</br>
+								<ul>
+									{% for example in sdf['examples'] %}
+										<li>{{ example['example'] }}</li>
+									{% endfor %}
+								</ul>
+							{% endfor %}
+						{% endif %}
+						<br></br>
+					{% endfor %}
+				</ul>
+			</div>
 		{#% endfor %#}
 		{% endif %}
 	{% endfor %}
 {% endif %}
 <h1>{{ definitions }}</h1>
+
+<script type="text/javascript">
+	$( ".outer" ).mouseover(function() {
+	$( "#log" ).append( "<div>Handler for .mouseover() called.</div>" );
+	});
+</script>
 
 
