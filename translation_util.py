@@ -7,12 +7,17 @@ def _get_json(url):
     print url
     return json.loads(urllib.urlopen(url).read())
 
+def _escape_utf_characters(word):
+    return urllib.quote(word.lower().encode('utf-8'))
+
 def _lookup(word):
-    return _get_json("http://www.simplavortaro.org/api/v1/trovi/%s" % word.lower())
+    return _get_json("http://www.simplavortaro.org/api/v1/trovi/%s" %\
+     _escape_utf_characters(word))
 
 
 def _find_definition(word):
-    return _get_json("http://www.simplavortaro.org/api/v1/vorto/%s" % word)
+    return _get_json("http://www.simplavortaro.org/api/v1/vorto/%s" %\
+     _escape_utf_characters(word))
 
 
 def _parse_subdefinitions(subdefinitions):
