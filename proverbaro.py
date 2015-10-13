@@ -36,18 +36,14 @@ class TwitterPublisher(object):
         return client.api.statuses.update.post(status='%s #%s' %\
          (proverb, self.hashtag))
 
-
-proverbToWord = Table('Proverbs_To_Words', Base.metadata,
-    Column('proverb_id', Integer, ForeignKey('Proverbs.id')),
-    Column('definition_id',Integer, ForeignKey('Word_Definitions.id')))
-    #the class has to be rewritten
-    #Look http://docs.sqlalchemy.org/en/latest/orm/basic_relationships.html#many-to-many
-    # __tablename__ = 
-    # id = Column(Integer, primary_key = True)
-    # proverb_id = Column(Integer, ForeignKey('Proverbs.id'), nullable=False)
-    # definition_id = Column(Integer, ForeignKey('Word_Definitions.id'),\
-    #     nullable=False)
-
+class ProverbToWord(Base):
+    __tablename__ = 'Proverbs_To_Words'
+    left_id = Column('proverb_id', Integer,\
+        ForeignKey('Proverbs.id'), primary_key=True)
+    right_id = Column('definition_id', Integer,\
+        ForeignKey('Word_Definitions.id'), primary_key=True)
+    proverb = relationship('Proverb')
+    
 
 class WordDefinition(Base):
     __tablename__ = 'Word_Definitions'
@@ -62,9 +58,7 @@ class Proverb(Base):
     text = Column(Unicode, nullable=False)
     shown_times = Column(Integer, default=0, nullable=False)
     shown_last_time = Column(DateTime, default=None)
-    definitions = relationship('WordDefinition', secondary=proverbToWord)
-
-
+    definitions = relationship('WordDefinition', secondary='Proverbs_To_Words')
 
 
 class PostId(Base):
