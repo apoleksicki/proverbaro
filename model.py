@@ -1,6 +1,7 @@
 from sqlalchemy import desc, and_, between, Column, \
     Integer, Date, ForeignKey, Unicode, DateTime
 from sqlalchemy.orm import Session, relationship
+from sqlalchemy import func
 
 global proverb_to_show
 
@@ -27,12 +28,23 @@ def init_model(Base):
         shown_times = Column(Integer, default=0, nullable=False)
         shown_last_time = Column(DateTime, default=None)
         posts = relationship(PostId, backref='Proverb')
-    
+
+
+    class ProverbToWord(Base):
+        __tablename__ = 'Proverbs_To_Words'
+        left_id = Column('proverb_id', Integer,\
+            ForeignKey('Proverbs.id'), primary_key=True)
+        right_id = Column('definition_id', Integer,\
+            ForeignKey('Word_Definitions.id'), primary_key=True)
+        proverb = relationship('Proverb')
+        
+
     class WordDefinition(Base):
         __tablename__ = 'Word_Definitions'
         id = Column(Integer, primary_key=True)
         word = Column(Unicode, nullable=False)
-        definiton = Column(Unicode, nullable=False)        
+        definiton = Column(Unicode, nullable=False)
+
 
     class Model(object):
         def proverb_to_show(self, date, publish_id):
@@ -45,6 +57,9 @@ def init_model(Base):
         def post_list(self, fromDate, toDate):
             return PostId.query.filter(between(PostId.publish_date,\
                 fromDate, toDate)).order_by(desc(PostId.publish_date),\
-                PostId.publish_id).all()                         
+                PostId.publish_id).all()
+        def calculate_publish_id(self, date, session):
+            return session.query(func.max(PostId.publish_id)).\
+                filter(PostId.publish_date == date).first()[0]
 
     return Model()        

@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy import func
 from sqlite3 import dbapi2 as sqlite
 from birdy.twitter import UserClient
+from model import init_model
 import datetime
 import sys
 import traceback
@@ -20,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 Base = declarative_base()
 
+model = init_model(Base)
 
 class TwitterPublisher(object):
     def __init__(self, consumer_key, consumer_secret, access_token,
@@ -36,50 +38,13 @@ class TwitterPublisher(object):
         return client.api.statuses.update.post(status='%s #%s' %\
          (proverb, self.hashtag))
 
-class ProverbToWord(Base):
-    __tablename__ = 'Proverbs_To_Words'
-    left_id = Column('proverb_id', Integer,\
-        ForeignKey('Proverbs.id'), primary_key=True)
-    right_id = Column('definition_id', Integer,\
-        ForeignKey('Word_Definitions.id'), primary_key=True)
-    proverb = relationship('Proverb')
-    
-
-class WordDefinition(Base):
-    __tablename__ = 'Word_Definitions'
-    id = Column(Integer, primary_key=True)
-    word = Column(Unicode, nullable=False)
-    definiton = Column(Unicode, nullable=False)
-
-
-class Proverb(Base):
-    __tablename__ = 'Proverbs'
-    id = Column(Integer, primary_key=True)
-    text = Column(Unicode, nullable=False)
-    shown_times = Column(Integer, default=0, nullable=False)
-    shown_last_time = Column(DateTime, default=None)
-    definitions = relationship('WordDefinition', secondary='Proverbs_To_Words')
-
-
-class PostId(Base):
-    __tablename__ = 'Post_Ids'
-    id = Column(Integer, primary_key=True)
-    publish_date = Column(Date, nullable=False)
-    publish_id = Column(Integer, nullable=False)
-    proverb_id = Column(Integer, ForeignKey('Proverbs.id'), nullable=False)
-
-    def __init__(self, publish_date, publish_id, proverb_id):
-        self.publish_date = publish_date
-        self.publish_id = publish_id
-        self.proverb_id = proverb_id
 
 def create_tables():
     Base.metadata.create_all(e)
 
 
 def _calculate_publish_id(date, session):
-    currentId = session.query(func.max(PostId.publish_id)).filter(
-        PostId.publish_date == date).first()[0]
+    currentId = model.calculate_publish_id(date, session)
     if currentId is None:
         currentId = 1
     else:
