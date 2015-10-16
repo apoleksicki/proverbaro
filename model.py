@@ -2,6 +2,8 @@ from sqlalchemy import desc, and_, between, Column, \
     Integer, Date, ForeignKey, Unicode, DateTime
 from sqlalchemy.orm import Session, relationship
 from sqlalchemy import func
+from sqlalchemy import Column, Integer, Unicode, DateTime, Date, ForeignKey
+import datetime
 
 global proverb_to_show
 
@@ -46,7 +48,7 @@ def init_model(Base):
         definiton = Column(Unicode, nullable=False)
 
 
-    class Model(object):
+    class Repository(object):
         def proverb_to_show(self, date, publish_id):
             return Proverb.query.join(PostId).filter(and_(
                 PostId.publish_date == date,
@@ -62,4 +64,28 @@ def init_model(Base):
             return session.query(func.max(PostId.publish_id)).\
                 filter(PostId.publish_date == date).first()[0]
 
-    return Model()        
+        def _calculate_publish_id(self, date, session):
+            currentId = self.calculate_publish_id(date, session)
+            if currentId is None:
+                currentId = 1
+            else:
+                currentId += 1
+            return currentId
+
+        def create_PostId(self, session, proverbId):
+            today = datetime.date.today()
+            publishId = self._calculate_publish_id(today, session)
+            return PostId(today, publishId, proverbId)
+        
+        def fetch_next_proverb(self, session):
+            return session.query(Proverb).filter(
+                Proverb.shown_times == session.query(
+                    func.min(Proverb.shown_times)))\
+                    .order_by(func.random()).first()
+
+        def fetch_last_post_date(self, session):
+            return session.query(func.max(Proverb.shown_last_time)).first()[0]            
+
+
+
+    return Repository()        
