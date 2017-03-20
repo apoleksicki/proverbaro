@@ -2,7 +2,6 @@
 import logging
 import argparse
 import proverbaro
-import datetime
 from time import sleep
 
 FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -37,9 +36,11 @@ def execute_remaining_delay(delay):
 
 def show_proverbs(delay, limit, consumer_key, consumer_secret, access_token,
                   access_token_key, hashtag):
-    publisher = proverbaro.TwitterPublisher(consumer_key, consumer_secret,
-                                            access_token, access_token_key,
-                                            hashtag)
+    publisher = proverbaro.TwitterPublisher(
+        consumer_key, consumer_secret,
+        access_token, access_token_key,
+        hashtag)
+
     if limit is None:
         while True:
             proverbaro.show_proverb(publisher)
@@ -55,21 +56,28 @@ def show_proverbs(delay, limit, consumer_key, consumer_secret, access_token,
 
 def main():
     parser = argparse.ArgumentParser(description='Proverbaro')
-    parser.add_argument('consumer_key', help='The consumer key of'
-                        'the aplication')
-    parser.add_argument('consumer_secret', help='The consumer secret of'
-                        'the aplication')
+    parser.add_argument(
+        'consumer_key', help='The consumer key of the aplication')
+    parser.add_argument(
+        'consumer_secret', help='The consumer secret of the aplication')
     parser.add_argument('access_token', help='The access token')
     parser.add_argument('access_token_key', help='The access token secret')
-    parser.add_argument('-d', '--delay', type=int, help='Delay in seconds'
-                        'between posting proverbs')
-    parser.add_argument('-l', '--limit', type=int, help='Number of posts'
-                        'to show')
-    parser.add_argument('-f', '--force', help='Forces posting of the first'
-                        'proverb without checking the delay',
-                        action="store_true")
-    parser.add_argument('-t', '--tag', default='esperanto', 
-                        help='A hashtag attached to each tweet. #Esperanto by default' )
+    parser.add_argument(
+        '-d', '--delay', type=int,
+        help='Delay in seconds between posting proverbs',
+    )
+    parser.add_argument(
+        '-l', '--limit', type=int,
+        help='Number of posts to show',
+    )
+    parser.add_argument(
+        '-f', '--force',
+        help='Forces posting of the first proverb without checking the delay',
+        action='store_true',
+    )
+    parser.add_argument(
+        '-t', '--tag', default='esperanto', 
+        help='A hashtag attached to each tweet. #Esperanto by default')
     args = parser.parse_args()
     delay = day
     limit = None
@@ -80,8 +88,10 @@ def main():
     if not args.force:
         execute_remaining_delay(delay)
 
-    show_proverbs(delay, limit, args.consumer_key, args.consumer_secret,
-                  args.access_token, args.access_token_key, args.tag)
+    show_proverbs(
+        delay, limit, args.consumer_key, args.consumer_secret,
+        args.access_token, args.access_token_key, args.tag)
+
 
 if __name__ == '__main__':
     main()

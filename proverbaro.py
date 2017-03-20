@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import Column, Integer, Unicode, DateTime, Date, ForeignKey
+# from sqlalchemy import Column, Integer, Unicode, DateTime, Date, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, relationship
-from sqlalchemy.schema import Table
+from sqlalchemy.orm import Session  # , relationship
 from sqlalchemy import create_engine
 
 from sqlite3 import dbapi2 as sqlite
@@ -13,9 +12,11 @@ import sys
 import traceback
 import logging
 
-e = create_engine('sqlite+pysqlite:///proverbaro.db',
-                  module=sqlite,
-                  encoding="utf-8")
+e = create_engine(
+    'sqlite+pysqlite:///proverbaro.db',
+    module=sqlite,
+    encoding="utf-8",
+)
 
 logger = logging.getLogger(__name__)
 
@@ -23,9 +24,11 @@ Base = declarative_base()
 
 repository = init_model(Base)
 
+
 class TwitterPublisher(object):
-    def __init__(self, consumer_key, consumer_secret, access_token,
-                 access_token_key, hashtag):
+    def __init__(
+            self, consumer_key, consumer_secret, access_token,
+            access_token_key, hashtag):
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
         self.access_token = access_token
@@ -35,12 +38,13 @@ class TwitterPublisher(object):
     def post_tweet(self, proverb):
         client = UserClient(self.consumer_key, self.consumer_secret,
                             self.access_token, self.access_token_key)
-        return client.api.statuses.update.post(status='%s #%s' %\
-         (proverb, self.hashtag))
+        return client.api.statuses.update.post(
+            status='%s #%s' % (proverb, self.hashtag))
 
 
 def create_tables():
     Base.metadata.create_all(e)
+
 
 def fetch_delta_from_last_post():
     session = Session(bind=e)
@@ -66,7 +70,8 @@ def fetch_proverb():
     try:
         repository.fetch_next_proverb(session)
     finally:
-        session.close()            
+        session.close()
+
 
 def show_proverb(publisher):
     session = Session(bind=e)
@@ -87,4 +92,4 @@ def show_proverb(publisher):
 
 
 if __name__ == '__main__':
-    create_tables()        
+    create_tables()
